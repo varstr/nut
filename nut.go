@@ -9,7 +9,9 @@ import (
 )
 
 const (
-    nutFile = ".nut.json"
+    nutFile = ".nut"
+    nutFilePerm = 0666
+    dirPerm = 0755
 )
 
 type Repo struct {
@@ -68,11 +70,30 @@ func (n *Nut) addDeps() {
 
 func (n *Nut) deployDeps() {
     gopath := goPaths()[0]
+
     for remote, repo := range n.Deps {
         vcs := selectVCS(repo.VCS)
         absPath := filepath.Join(gopath, "src", repo.Root)
-        vcs.download(remote, absPath)
+        if _, err := os.Stat(absPath); err == nil {
+            if r := vcs.getRemote(absPath); r != remote {
+                if err = os.RemoveAll(absPath); err != nil {
+                    exitOnError("rm " + absPath, err)
+                }
+                if err = os.MkdirAll(absPath, dirPerm); err != nil {
+                    exitOnError("mkdir " + absPath, err)
+                }
+                vcs.download(remote, absPath)
+            }
+        } else if os.IsNotExist(err) {
+            vcs.download(remote, absPath)
+        } else {
+            exitOnError("stat "+absPath, err)
+        }
         vcs.toRev(absPath, repo.Rev)
+    }
+
+
+    for _, repo := range n.Deps {
         for _, pkg := range repo.Pkgs {
             goInstall(pkg)
         }
@@ -89,7 +110,7 @@ func (n *Nut) dump() {
     if err = os.Chdir(dir); err != nil {
         exitOnError("chdir "+dir, err)
     }
-    if err = ioutil.WriteFile(nutFile, buffer, os.ModePerm); err != nil {
+    if err = ioutil.WriteFile(nutFile, buffer, nutFilePerm); err != nil {
         exitOnError("write file "+nutFile, err)
     }
 }

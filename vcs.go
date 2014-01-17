@@ -76,7 +76,6 @@ func (v *vcs) getRelRoot(dir string) string {
     return ""
 }
 
-// TODO: deal with non-empty dir
 func (v *vcs) download(remote, dir string) string {
     return run(".", v.name, append(v.dlArgs, remote, dir)...)
 }
