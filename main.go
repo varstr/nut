@@ -10,12 +10,12 @@ const (
     
 Usage:
 
-    nut command [arguments]
+    nut <command> [<arguments>]
 
 The commands are:
-    make        make a nut for proj
-    open        deploy
-    add         add specific pkg to a nut
+    make        make a nut for the target project
+    open        deploy all packages according to an existed nut
+    add         add a specific package to a nut
     `
 )
 
