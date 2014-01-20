@@ -60,11 +60,11 @@ func goList(tpl, path string) string {
     return run(".", "go", "list", "-f", tpl, path)
 }
 
-func goGetDeps(path string) []string {
+func goListDeps(path string) []string {
     return strings.Split(goList(depTpl, path), " ")
 }
 
-func goGetDir(path string) string {
+func goListDir(path string) string {
     return goList(dirTpl, path)
 }
 

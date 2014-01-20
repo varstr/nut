@@ -34,7 +34,7 @@ func newNut(path string) *Nut {
 }
 
 func (n *Nut) addPkg(pkg string) {
-    dir := goGetDir(pkg)
+    dir := goListDir(pkg)
     if len(dir) == 0 {
         return
     }
@@ -59,7 +59,7 @@ func (n *Nut) addPkg(pkg string) {
 }
 
 func (n *Nut) addDeps() {
-    deps := goGetDeps(n.Path)
+    deps := goListDeps(n.Path)
     for _, dep := range deps {
         if strings.HasPrefix(dep, n.Path) {
             continue
@@ -101,7 +101,7 @@ func (n *Nut) deployDeps() {
 }
 
 func (n *Nut) dump() {
-    dir := goGetDir(n.Path)
+    dir := goListDir(n.Path)
 
     buffer, err := json.MarshalIndent(n, "", " ")
     if err != nil {
@@ -116,7 +116,7 @@ func (n *Nut) dump() {
 }
 
 func (n *Nut) load() {
-    dir := goGetDir(n.Path)
+    dir := goListDir(n.Path)
 
     if err := os.Chdir(dir); err != nil {
         exitOnError("chdir "+dir, err)
